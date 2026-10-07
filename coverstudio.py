@@ -426,8 +426,8 @@ def find_models(model_dir):
                 ckpt = p
                 break
         if ckpt:
-            tone = ROLE_TONES.get(role, "")
-            display = role if not tone else f"{role}（{tone}）"
+            # 下拉显示完整目录名（如「祥子 步数20000」），不截断、不加音色简写
+            display = d.name.strip()
             models.append((display, role, str(ckpt)))
     return models
 

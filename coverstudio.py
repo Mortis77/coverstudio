@@ -28,7 +28,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
 APP_NAME = "AI翻唱工坊 CoverStudio"
-VERSION = "1.4.0"
+VERSION = "1.4.1"
 
 # ---------------------------------------------------------------- 路径/配置
 
@@ -151,49 +151,55 @@ def download_component(url, dest_dir, log_cb=None, progress_cb=None):
 
 # ---------------------------------------------------------------- 组件自动获取（v1.4：软件自主联网找资源）
 
-# 内置候选源；软件按顺序自动尝试，第一个可用的即使用。动态源（GitHub/ModelScope）由 resolve_component_sources 实时解析。
+# 内置候选源；软件按顺序自动尝试，第一个可用的即使用。
+# v1.4.1：优先从作者仓库 Mortis77/coverstudio Release 拉取全量组件（0 门槛），第三方官方源作兜底。
+REL_BASE = "https://github.com/Mortis77/coverstudio/releases/download/v1.4-components"
 COMPONENT_SOURCES = {
     "ffmpeg": [
+        {"kind": "direct", "url": REL_BASE + "/ffmpeg-win64.zip",
+         "label": "ffmpeg（作者仓库 v1.4-components，约 141 MB）"},
         {"kind": "direct", "url": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip",
          "label": "ffmpeg 官方构建（gyan.dev，约 110 MB）"},
     ],
     "msst": [
+        {"kind": "direct", "url": REL_BASE + "/MSST-GUI-1.4.0-src.zip",
+         "label": "MSST-GUI 源码（作者仓库 v1.4-components，含 inference.py）"},
         {"kind": "github_zipball", "repo": "AliceNavigator/Music-Source-Separation-Training-GUI",
          "label": "MSST-GUI 官方源码（GitHub 最新版，含 inference.py）"},
     ],
     "msst_model": [
+        {"kind": "direct", "url": REL_BASE + "/mel_band_roformer_vocals_becruily.ckpt",
+         "label": "人声分离模型（作者仓库 v1.4-components，约 870 MB）"},
         {"kind": "direct", "url": "https://huggingface.co/becruily/mel-band-roformer-vocals/resolve/main/mel_band_roformer_vocals_becruily.ckpt",
          "label": "人声分离模型（HuggingFace becruily，约 870 MB）"},
         {"kind": "direct", "url": "https://hf-mirror.com/becruily/mel-band-roformer-vocals/resolve/main/mel_band_roformer_vocals_becruily.ckpt",
          "label": "人声分离模型（HF 镜像）"},
-        {"kind": "direct", "url": "https://huggingface.co/KimberleyJSN/melbandroformer/resolve/main/MelBandRoformer.ckpt",
-         "label": "人声分离模型（KimberleyJSN，约 870 MB）"},
     ],
     "ddsp": [
+        {"kind": "direct", "url": REL_BASE + "/DDSP-SVC-6.2-src.zip",
+         "label": "DDSP-SVC 源码（作者仓库 v1.4-components，含 main_reflow.py）"},
         {"kind": "github_zipball", "repo": "yxlllc/DDSP-SVC",
          "label": "DDSP-SVC 官方源码（GitHub 最新版，含 main_reflow.py）"},
-        {"kind": "github_asset", "repo": "yxlllc/DDSP-SVC", "pattern": r"model_0\.pt",
-         "label": "DDSP 预训练模型 model_0.pt（GitHub Release，约 64 MB）"},
     ],
     "ddsp_pretrain": [
-        {"kind": "modelscope", "repo": "BG4JEC/DDSP61_SVC41_Pretrain_Models",
-         "path": "DDSP-SVC/contentvec/checkpoint_best_legacy_500.pt",
-         "label": "contentvec 编码器（ModelScope）"},
-        {"kind": "modelscope", "repo": "BG4JEC/DDSP61_SVC41_Pretrain_Models",
-         "path": "DDSP-SVC/contentvec/hubert-soft-0d54a1f4.pt",
-         "label": "hubert-soft 编码器（ModelScope）"},
-        {"kind": "modelscope", "repo": "BG4JEC/DDSP61_SVC41_Pretrain_Models",
-         "path": "DDSP-SVC/rmvpe/model.pt",
-         "label": "RMVPE 音高提取器（ModelScope）"},
-        {"kind": "modelscope", "repo": "BG4JEC/DDSP61_SVC41_Pretrain_Models",
-         "path": "DDSP-SVC/nsf_hifigan/config.json",
-         "label": "NSF-HiFiGAN 配置（ModelScope）"},
-        {"kind": "modelscope", "repo": "BG4JEC/DDSP61_SVC41_Pretrain_Models",
-         "path": "DDSP-SVC/nsf_hifigan/model",
-         "label": "NSF-HiFiGAN 声码器模型（ModelScope）"},
-        {"kind": "modelscope", "repo": "BG4JEC/DDSP61_SVC41_Pretrain_Models",
-         "path": "DDSP-SVC/nsf_hifigan/nsf_hifigan_44.1k_hop512_128bin_2024.02.ckpt",
-         "label": "NSF-HiFiGAN 44.1k（ModelScope）"},
+        {"kind": "direct", "url": REL_BASE + "/contentvec_checkpoint_best_legacy_500.pt",
+         "path": "contentvec/checkpoint_best_legacy_500.pt",
+         "label": "contentvec 编码器（作者仓库 v1.4-components）"},
+        {"kind": "direct", "url": REL_BASE + "/hubert-soft-0d54a1f4.pt",
+         "path": "contentvec/hubert-soft-0d54a1f4.pt",
+         "label": "hubert-soft 编码器（作者仓库 v1.4-components）"},
+        {"kind": "direct", "url": REL_BASE + "/rmvpe_model.pt",
+         "path": "rmvpe/model.pt",
+         "label": "RMVPE 音高提取器（作者仓库 v1.4-components）"},
+        {"kind": "direct", "url": REL_BASE + "/nsf_hifigan_config.json",
+         "path": "nsf_hifigan/config.json",
+         "label": "NSF-HiFiGAN 配置（作者仓库 v1.4-components）"},
+        {"kind": "direct", "url": REL_BASE + "/nsf_hifigan_model",
+         "path": "nsf_hifigan/model",
+         "label": "NSF-HiFiGAN 声码器模型（作者仓库 v1.4-components）"},
+        {"kind": "direct", "url": REL_BASE + "/nsf_hifigan_44.1k_model.ckpt",
+         "path": "nsf_hifigan/nsf_hifigan_44.1k_hop512_128bin_2024.02.ckpt",
+         "label": "NSF-HiFiGAN 44.1k（作者仓库 v1.4-components）"},
     ],
 }
 

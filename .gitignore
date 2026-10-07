@@ -1,0 +1,13 @@
+# 本机环境与下载缓存不入库
+config.json
+models/
+toolkit/
+__pycache__/
+build/
+dist/
+
+# 音频/视频产物
+*.wav
+*.mp3
+*.mp4
+*.srt

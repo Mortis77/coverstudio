@@ -1,0 +1,11 @@
+{
+  "msst_dir": "",
+  "msst_python": "",
+  "ddsp_dir": "",
+  "ddsp_python": "",
+  "model_dir": "",
+  "msst_config": "config_vocals_mel_band_roformer_kim.yaml",
+  "msst_ckpt": "mel_band_roformer_vocals_becruily.ckpt",
+  "use_gpu_separate": true,
+  "output_dir": ""
+}

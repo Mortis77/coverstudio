@@ -52,6 +52,18 @@ ROLE_TONES = {
     "爱音": "明亮灵动",
 }
 
+# 角色目录简称 -> 角色全名（用于下拉栏展示）
+ROLE_FULL_NAMES = {
+    "祥子": "丰川祥子",
+    "素世": "长崎素世",
+    "喵梦": "祐天寺喵梦",
+    "高松灯": "高松灯",
+    "立希": "椎名立希",
+    "初华": "三角初华",
+    "若叶睦": "若叶睦",
+    "爱音": "千早爱音",
+}
+
 DEFAULT_CONFIG = {
     "ddsp_dir": r"E:\AI音乐\.DDSP\DDSP-barbara-6.2",
     "ddsp_python": r"E:\AI音乐\.DDSP\DDSP-barbara-6.2\env\python.exe",
@@ -426,8 +438,8 @@ def find_models(model_dir):
                 ckpt = p
                 break
         if ckpt:
-            # 下拉显示完整目录名（如「祥子 步数20000」），不截断、不加音色简写
-            display = d.name.strip()
+            # 下拉显示角色全名（如「丰川祥子」），优先查全名映射，未知角色回退目录名
+            display = ROLE_FULL_NAMES.get(role, d.name.strip())
             models.append((display, role, str(ckpt)))
     return models
 

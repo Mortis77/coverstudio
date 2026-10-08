@@ -2,6 +2,12 @@
 
 一键 AI 翻唱工具：MSST 人声分离 → DDSP AI 转音 → 混音 → 歌词字幕，输出带伴奏成品 + .srt 字幕，可选合成 MP4 视频（免 PR）。
 
+## 下载与发布说明
+
+- **一键式程序**：请到 [Releases · v1.4.4](https://github.com/Mortis77/coverstudio/releases/tag/v1.4.4) 下载 `CoverStudio_v1.4.4.exe`（即 AI 翻唱工坊，仅约 11MB）。双击即可运行，无需安装 Python。
+- **组件与模型不占用 Release 下载页**：工具链、预训练与 8 个角色模型由软件启动后在「组件管理」点「自动获取」自动拉取安装，详见下文。
+- **源码与文档**：全部源码、配置示例与本文档保留在仓库 main 分支。
+
 ## 使用方式
 
 双击 `AI翻唱工坊.exe` 启动。两种输入任选其一：
@@ -41,7 +47,7 @@ v1.4.1 起，全部组件优先从**作者仓库 Release**（[Mortis77/coverstud
 
 | 文件 | 说明 |
 |------|------|
-| AI翻唱工坊.exe | 主程序（无需安装 Python，约 11MB） |
+| CoverStudio_v1.4.4.exe（AI翻唱工坊.exe） | 主程序（在 [Releases · v1.4.4](https://github.com/Mortis77/coverstudio/releases/tag/v1.4.4) 下载，无需安装 Python，约 11MB） |
 | config.json | 工具链路径配置（v1.4 起不再需要手填下载直链，组件源由软件内置管理） |
 | audio_utils.py | 音频转码 / 混音脚本（由工具链 Python 调用，请勿删除） |
 | models\ | 角色模型目录（随包内置或自动获取，自动识别） |

@@ -54,15 +54,6 @@ v1.4.1 起，全部组件优先从**作者仓库 Release**（[Mortis77/coverstud
 | models\ | 角色模型目录（随包内置或自动获取，自动识别） |
 | toolkit\ | 按需安装的组件目录（MSST / DDSP / models / ffmpeg.exe） |
 
-## 依赖环境（本机开发模式）
-
-软件依赖本机已安装的 AI 音乐工具链（自动探测或手动配置，也可用组件管理安装到 toolkit）：
-
-- **MSST**（人声分离）：`E:\AI音乐\分离\MSST-GUI-1.4.0`，Python 环境需含 CUDA 版 torch（分离支持 GPU）
-- **DDSP-SVC**（AI 转音）：`E:\AI音乐\.DDSP\DDSP-barbara-6.2`，Python 环境需含 librosa / soundfile
-- **角色模型**：`E:\AI音乐\.DDSP\DDSP模型\角色名 步数N`，自动扫描目录内最大步数 ckpt
-
-若目录结构不同，打开软件右上角「设置」修改对应路径后保存即可。
 
 ## 流程说明
 

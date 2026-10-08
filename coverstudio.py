@@ -28,7 +28,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
 APP_NAME = "AI翻唱工坊 CoverStudio"
-VERSION = "1.4.4"
+VERSION = "1.4.5"
 
 # ---------------------------------------------------------------- 路径/配置
 
@@ -950,17 +950,15 @@ class App(tk.Tk):
 
         self._build_ui()
         self.after(100, self._poll)
+        if self._missing_at_startup:
+            self.after(400, self._auto_fetch_missing_at_startup)
 
     def _init_config(self):
         cfg = auto_detect_config()
         if not CONFIG_FILE.exists():
             save_config(cfg)
         self._models = find_models(cfg["model_dir"])
-        if not self._models:
-            messagebox.showwarning(
-                APP_NAME,
-                "未在 %s 找到角色模型。\n请打开 设置-工具链路径 检查模型目录，\n或在 组件管理 中按需安装缺失组件。" % cfg["model_dir"],
-            )
+        # v1.4.5：模型/组件缺失统一交给首次启动自动获取流程提示并联网安装，不再单独弹 warning
         missing = [k for k, v in component_status(cfg).items() if not v["ready"]]
         if missing:
             names = {"msst": "MSST 工具链", "ddsp": "DDSP 工具链", "models": "角色模型", "ffmpeg": "ffmpeg"}
@@ -1441,6 +1439,26 @@ class App(tk.Tk):
         refresh()
 
     # ---------- 组件安装/下载线程 ----------
+    def _auto_fetch_missing_at_startup(self):
+        """v1.4.5：首次启动检测到缺失组件时自动联网获取，无需用户手动点「组件管理-自动获取」。"""
+        label_map = {"MSST 工具链": "msst", "DDSP 工具链": "ddsp", "角色模型": "models", "ffmpeg": "ffmpeg"}
+        keys = [label_map[n] for n in self._missing_at_startup if n in label_map]
+        if not keys:
+            return
+        self._append_log("首次启动：检测到缺失组件 %s，自动开始获取…" % "、".join(self._missing_at_startup))
+        messagebox.showinfo(
+            APP_NAME,
+            "检测到缺失组件：%s\n已自动开始联网获取并安装，请留意主界面日志。\n"
+            "首次获取需下载较多资源（合计数 GB），耗时取决于网速；\n"
+            "期间可正常操作，全部就绪后即可开始翻唱。" % "、".join(self._missing_at_startup),
+        )
+
+        def run():
+            for k in keys:
+                self._comp_auto_job(k)
+
+        threading.Thread(target=run, daemon=True).start()
+
     def _comp_install_job(self, key, src):
         try:
             self.q.put(("log", "安装组件 %s（%s）…" % (key, src)))

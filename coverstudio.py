@@ -28,7 +28,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
 APP_NAME = "AI翻唱工坊 CoverStudio"
-VERSION = "1.4.1"
+VERSION = "1.4.4"
 
 # ---------------------------------------------------------------- 路径/配置
 
@@ -75,7 +75,7 @@ DEFAULT_CONFIG = {
     "use_gpu_separate": True,
     "output_dir": str(Path.home() / "Desktop" / "AI翻唱成品"),
     # v1.4：组件由软件自动联网获取（内置 GitHub/ModelScope/官方源，无需手动填写直链）
-    # 角色模型随软件包内置：放在 exe 同级 models\ 即自动识别
+    # v1.4.4：角色模型同样可从作者仓库 Release 自动获取；也支持 exe 同级 models\ 内置
 }
 
 
@@ -105,12 +105,16 @@ def component_status(cfg):
     n = 0
     if md and Path(md).exists():
         n = len(find_models(md))
-    tag = "（随包内置）" if md and Path(md) == bundled else ""
+    tag = ""
+    if md and Path(md) == bundled:
+        tag = "（随包内置）"
+    elif md and Path(md) == app_dir() / "toolkit" / "models":
+        tag = "（已自动获取）"
     st["models"] = {
         "ready": n > 0,
         "label": "角色模型（%d 个）%s" % (n, tag),
         "desc": str(md),
-        "size_hint": "随软件包分发，放在 exe 同级 models\\ 即自动识别",
+        "size_hint": "每个约 300~600MB（组件管理可自动获取）",
     }
     st["ffmpeg"] = {
         "ready": bool(find_ffmpeg()),
@@ -1425,7 +1429,8 @@ class App(tk.Tk):
             "· 自动获取：软件自动联网查找官方资源（GitHub 最新源码/预训练模型、ModelScope、ffmpeg 官方构建），"
             "下载并自动创建运行环境，适合新机器首装。\n"
             "· 本地安装：从本机已有目录复制组件到 exe 同级 toolkit\\，适合已有工具链的机器快速就绪。\n"
-            "· 角色模型：随软件包内置，放在 exe 同级 models\\ 即自动识别（无需下载）；也可用“本地安装”导入自己的模型目录。"
+            "· 角色模型：随软件包内置，或点「自动获取」从作者仓库下载 8 个角色模型（共约 4.4GB），"
+            "解压到 exe 同级 models\\（toolkit\\models）即自动识别；也可用“本地安装”导入自己的模型目录。"
         ), foreground="#666", justify=tk.LEFT, wraplength=680)
         tip.pack(anchor=tk.W)
 
@@ -1503,7 +1508,7 @@ class App(tk.Tk):
             elif key == "ddsp":
                 self._auto_fetch_ddsp(log)
             elif key == "models":
-                raise RuntimeError("角色模型随软件包内置，无需下载；请将模型目录放在 exe 同级 models\\ 后刷新状态。")
+                self._auto_fetch_models(log)
             p = portable_cfg(app_dir())
             if p:
                 self.cfg = p
@@ -1517,6 +1522,39 @@ class App(tk.Tk):
             self.q.put(("info", "组件 %s 自动获取完成。" % key))
         except Exception as e:
             self.q.put(("error", "组件 %s 自动获取失败: %s" % (key, e)))
+
+    def _auto_fetch_models(self, log):
+        """自动获取角色模型：从作者仓库 v1.4-components Release 下载 8 个角色 zip 并解压到 toolkit\\models。"""
+        dst_tk = app_dir() / "toolkit"
+        dst = dst_tk / "models"
+        dst.mkdir(parents=True, exist_ok=True)
+        cands = resolve_component_sources("models", log_cb=log)
+        if not cands:
+            raise RuntimeError("角色模型源解析失败（作者仓库不可达？）")
+        got = 0
+        tmp = dst_tk / "_dl_tmp_models"
+        for c in cands:
+            try:
+                log("下载 %s" % c.get("label"))
+                out = download_component(c["url"], str(tmp), log_cb=log)
+                moved = 0
+                for child in out.iterdir():
+                    if child.is_dir():
+                        tgt = dst / child.name
+                        if tgt.exists():
+                            shutil.rmtree(str(tgt))
+                        shutil.move(str(child), str(tgt))
+                        moved += 1
+                if moved == 0:
+                    log("候选 %s：压缩包内未发现模型目录" % c.get("label"))
+                else:
+                    got += 1
+            except Exception as e:
+                log("候选 %s 失败：%s" % (c.get("label"), e))
+        shutil.rmtree(str(tmp), ignore_errors=True)
+        if got == 0:
+            raise RuntimeError("角色模型自动获取失败：所有候选源均不可达")
+        log("角色模型已就绪：toolkit\\models 下共 %d 个模型目录" % got)
 
     def _auto_fetch_msst(self, log):
         """自动获取 MSST：官方源码 + 人声分离模型 + 自动创建 Python 环境。"""

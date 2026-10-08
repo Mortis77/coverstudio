@@ -1,11 +1,12 @@
-# AI 翻唱工坊 CoverStudio v1.4.4
+# AI 翻唱工坊 CoverStudio v1.4.5
 
 一键 AI 翻唱工具：MSST 人声分离 → DDSP AI 转音 → 混音 → 歌词字幕，输出带伴奏成品 + .srt 字幕，可选合成 MP4 视频（免 PR）。
 
 ## 下载与发布说明
 
-- **一键式程序**：请到 [Releases · v1.4.4](https://github.com/Mortis77/coverstudio/releases/tag/v1.4.4) 下载 `CoverStudio_v1.4.4.exe`（即 AI 翻唱工坊，仅约 11MB）。双击即可运行，无需安装 Python。
-- **组件与模型不占用 Release 下载页**：工具链、预训练与 8 个角色模型由软件启动后在「组件管理」点「自动获取」自动拉取安装，详见下文。
+- **一键式程序**：请到 [Releases · v1.4.5](https://github.com/Mortis77/coverstudio/releases/tag/v1.4.5) 下载 `CoverStudio_v1.4.5.exe`（即 AI 翻唱工坊，仅约 11MB）。双击即可运行，无需安装 Python。
+- **首次启动全自动**：双击后软件自动检测缺失的组件与模型，并自动联网获取安装，无需手动点「组件管理-自动获取」；全部就绪后即可直接翻唱。
+- **组件与模型不占用 Release 下载页**：工具链、预训练与 8 个角色模型由软件自动拉取安装，详见下文。
 - **源码与文档**：全部源码、配置示例与本文档保留在仓库 main 分支。
 
 ## 使用方式
@@ -25,7 +26,7 @@
 
 ## 0 门槛安装（v1.4 自动获取）
 
-**安装包只有约 11MB**（exe + ffmpeg），不打包工具链与模型；首次使用前打开「组件管理」，点「自动获取」，软件会**自主联网解析组件源并下载安装**，无需用户填写任何直链或配置路径。
+**安装包只有约 11MB**（exe + ffmpeg），不打包工具链与模型；**首次双击启动时软件自动检测缺失组件并自动联网获取安装**（也可在「组件管理」里手动触发），无需用户填写任何直链或配置路径。
 
 v1.4.1 起，全部组件优先从**作者仓库 Release**（[Mortis77/coverstudio · v1.4-components](https://github.com/Mortis77/coverstudio/releases/tag/v1.4-components)）拉取，第三方官方源（GitHub / HuggingFace / ModelScope / gyan.dev）作兜底：
 
